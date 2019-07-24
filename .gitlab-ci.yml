@@ -1,29 +1,21 @@
-# Using the node alpine image to build the React app
-image: node:alpine
+image: node:latest
 
-# Announce the URL as per CRA docs
-# https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/template/README.md#advanced-configuration
-variables:
-  PUBLIC_URL: /react-env-setup
-# Cache node modules - speeds up future builds
+stages:
+  - build
+  - test
+
 cache:
   paths:
-    - node_modules
+    - node_modules/
 
-# Name the stages involved in the pipeline
-stages:
-  - deploy
-
-# Job name for gitlab to recognise this results in assets for Gitlab Pages
-# https://docs.gitlab.com/ee/user/project/pages/introduction.html#gitlab-pages-requirements
-pages:
-  stage: deploy
+install_dependencies:
+  stage: build
   script:
-    - yarn install # Install all dependencies
-    - yarn build
-    - cp public/index.html public/404.html # Not necessary, but helps with https://medium.com/@pshrmn/demystifying-single-page-applications-3068d0555d46
+    - yarn install
   artifacts:
     paths:
-      - public # The built files for Gitlab Pages to serve
-  only:
-    - master # Only run on master branch
+      - node_modules/
+
+testing_app:
+  stage: test
+  script: yarn test
