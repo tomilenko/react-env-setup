@@ -20,3 +20,20 @@ install_dependencies:
 testing_app:
   stage: test
   script: yarn test
+
+deploy-web:
+  stage: deploy
+  stage: development
+  dependencies:
+    - install_dependencies
+  image: kahwee/node-ruby-dpl:latest
+  script:
+    - yarn build
+    - git init
+    - git config user.name "Pipeline CI"
+    - git config user.email "pipeline@ci.com"
+    - git add -A
+    - git commit -m "push for heroku only. commit must be reset after deployment is complete."
+    - dpl --provider=heroku --app=$HEROKU_APP_NAME --api-key=$HEROKU_API_KEY
+  only:
+    - master
